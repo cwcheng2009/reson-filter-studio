@@ -1,0 +1,11 @@
+.DS_Store
+*.log
+node_modules/
+.env
+.env.*
+*.key
+*api_key*
+*token*
+backend/
+__pycache__/
+*.pyc

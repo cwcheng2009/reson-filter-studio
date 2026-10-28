@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <title>ILab 共振濾波工作室 | ILab Resonance Filter Studio</title>
+  <meta name="description" content="多頻段共振濾波器組音像系統 (Multi-Band Resonant Filter Bank Studio) - 互動音樂與多媒體實驗室 (ILAB)">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css?v=2.5.0">
+</head>
+<body>
+
+  <!-- =========================================================================
+       1. 軟體名稱放最上方一行，網頁 QR Code 放在同一行
+       ========================================================================= -->
+  <header class="app-brand-bar">
+    <div class="logo-area">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/>
+        </svg>
+      </div>
+      <div>
+        <div class="brand-title-wrap">
+          <h1 class="main-title-cn">ILab 共振濾波工作室</h1>
+          <span class="main-title-en">ILab Resonance Filter Studio</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 網頁 QR Code 資訊列 (同在最上方一行右側) -->
+    <div class="top-ilab-inner">
+      <!-- Left: Clean ILAB Logo (Scaled to compact height ~32px) -->
+      <a href="https://ilab-ntut.blogspot.com/" target="_blank" rel="noopener noreferrer" class="top-ilab-logo-link" title="前往 ILAB 實驗室官方網站">
+        <div class="top-ilab-logo-bg">
+          <img src="assets/ilab_logo_clean.png" alt="ILAB Logo" class="top-ilab-logo-img">
+        </div>
+      </a>
+
+      <div class="top-ilab-divider"></div>
+
+      <!-- Center-Left: QR 1 (ILAB 實驗室網站) -->
+      <div class="top-qr-item" title="手機鏡頭對準 QR Code 即可掃描，或點擊前往">
+        <div class="qr-thumb-box">
+          <img src="assets/qr_lab.png" alt="ILAB 實驗室網站 QR Code" class="qr-thumb-img">
+        </div>
+        <div class="qr-meta">
+          <a href="https://ilab-ntut.blogspot.com/" target="_blank" rel="noopener noreferrer" class="qr-title">
+            🏛️ ILAB 實驗室網站 ↗
+          </a>
+          <span class="qr-url">ilab-ntut.blogspot.com</span>
+        </div>
+      </div>
+
+      <div class="top-ilab-divider"></div>
+
+      <!-- Center-Right: QR 2 (實驗室主持人：鄭建文) -->
+      <div class="top-qr-item" title="手機鏡頭對準 QR Code 即可掃描，或點擊前往">
+        <div class="qr-thumb-box">
+          <img src="assets/qr_director.png" alt="實驗室主持人：鄭建文 QR Code" class="qr-thumb-img">
+        </div>
+        <div class="qr-meta">
+          <a href="https://cwcheng2009.blogspot.com/" target="_blank" rel="noopener noreferrer" class="qr-title" style="color: #d8b4fe;">
+            👤 實驗室主持人：鄭建文 ↗
+          </a>
+          <span class="qr-url" style="color: #c084fc;">cwcheng2009.blogspot.com</span>
+        </div>
+      </div>
+
+      <!-- Toggle Full Big Banner Button -->
+      <button id="btnToggleFullBanner" class="btn btn-banner-toggle" title="展開 / 收合完整橫式標章圖檔">
+        <span id="bannerToggleText">📐 展開完整大圖</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Collapsible Full Banner Drawer -->
+  <div id="fullBannerDrawer" class="full-banner-drawer" style="display: none;">
+    <img src="assets/ilab_dual_qr_horizontal_director_name_white.png" alt="ILAB 橫式雙 QR 碼完整版" class="full-banner-img">
+  </div>
+
+  <!-- =========================================================================
+       2. 軟體各種功能列（位於上方資訊列下方，不比資訊內容高）
+       ========================================================================= -->
+  <nav class="app-functions-bar" aria-label="軟體主功能工具列">
+    <!-- Audio Engine Start / Suspend -->
+    <button id="btnAudioPower" class="btn btn-power btn-compact" title="啟動或暫停音訊處理引擎">
+      <span id="audioPowerIcon">▶</span>
+      <span id="audioPowerText">啟動音訊</span>
+    </button>
+    <span id="engineBadge" class="status-badge">待命中</span>
+
+    <div class="header-divider-v"></div>
+
+    <!-- Master Output Gain Boost (提升音量拉桿: 0dB 至 +18dB) -->
+    <div class="ctrl-group-inline" title="主輸出增益提升 (Output Gain Boost: 0dB 至 +18dB 放大，經由磚牆限制器放大不爆音)">
+      <label for="masterGainBoost">輸出增益</label>
+      <input type="range" id="masterGainBoost" min="0" max="18" step="0.5" value="0">
+      <span id="valMasterGainBoost" class="val-num-badge">0dB</span>
+    </div>
+
+    <!-- Master Volume -->
+    <div class="ctrl-group-inline">
+      <label for="masterVol">總音量</label>
+      <input type="range" id="masterVol" min="0" max="1.5" step="0.01" value="1.0">
+      <span id="valMasterVol" class="val-num-badge">100%</span>
+    </div>
+
+    <!-- Dry / Wet Balance -->
+    <div class="ctrl-group-inline dry-wet-header-group" title="原始輸入乾音 (Dry) 與 128帶共振濾波濕音 (Wet) 輸出比例">
+      <label for="dryWetMix">乾/濕比</label>
+      <input type="range" id="dryWetMix" min="0" max="1" step="0.01" value="0.85">
+      <span id="valDryWetHeader" class="val-num-badge">85%</span>
+    </div>
+
+    <!-- Master Brickwall Limiter & GR Meter -->
+    <div class="limiter-cluster" title="大師級防爆音限制器 (Master Brickwall Limiter) 與即時衰減指示">
+      <button id="btnLimiterToggle" class="btn btn-compact btn-limiter active" title="點擊切換限制器開關">
+        <span class="limiter-icon">🛡️</span>
+        <span id="limiterStatusText">LIMITER</span>
+      </button>
+      <div class="gr-meter-box" title="動態壓縮量 (Gain Reduction)">
+        <div id="grMeterBar" class="gr-meter-bar"></div>
+        <span id="grMeterVal" class="gr-meter-val">0dB</span>
+      </div>
+    </div>
+
+    <!-- Compact Recorder & Reset Cluster (No wasted row!) -->
+    <div class="rec-panic-cluster">
+      <button id="btnRecord" class="btn btn-record btn-compact" title="錄製主輸出為無損 16-bit 48kHz WAV 音檔">
+        <span class="rec-dot">●</span>
+        <span id="recText">錄製</span>
+      </button>
+      <span id="recTimer" class="rec-timer" style="display: none;">00:00</span>
+      <a id="btnDownloadWav" class="btn btn-download btn-compact" style="display: none;" title="點擊下載錄音檔">
+        <span>↓ WAV</span>
+      </a>
+      <button id="btnPanic" class="btn btn-panic btn-compact" title="重設音訊緩衝區">重設</button>
+    </div>
+  </nav>
+
+  <!-- Main Container -->
+  <main class="app-layout">
+
+    <!-- 8-Preset Morphing Master Bar -->
+    <section class="preset-morph-bar panel-card">
+      <div class="morph-bar-header">
+        <div class="morph-title-wrap">
+          <div class="morph-icon-box">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+            </svg>
+          </div>
+          <div>
+            <div class="morph-title-row">
+              <h2 class="morph-title">8 組預設快照漸變</h2>
+              <span id="activePresetBadge" class="active-preset-badge">槽位 1：西藏頌缽</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Morph Duration & Aux Controls -->
+        <div class="morph-time-controls">
+          <div class="morph-time-slider-wrap">
+            <div class="morph-time-label-row">
+              <label for="sliderMorphTime">漸變時間 (Morph Time)</label>
+              <span id="valMorphTime" class="morph-time-val">3.0 秒</span>
+            </div>
+            <input type="range" id="sliderMorphTime" min="0" max="60" step="0.5" value="3.0">
+          </div>
+
+          <div class="quick-time-chips">
+            <button class="chip-btn" data-time="0">即時 (0s)</button>
+            <button class="chip-btn" data-time="1.0">1s</button>
+            <button class="chip-btn active" data-time="3.0">3s</button>
+            <button class="chip-btn" data-time="10.0">10s</button>
+            <button class="chip-btn" data-time="30.0">30s</button>
+            <button class="chip-btn" data-time="60.0">60s (慢速音景)</button>
+          </div>
+
+          <div class="morph-action-buttons">
+            <!-- Source Mode Toggle (3-state: Lock, Follow Preset, Random Source) -->
+            <button id="btnToggleLockSource" class="btn btn-lock-toggle mode-lock" title="切換音源行為：🔒鎖定目前音源 / 🎵隨預設更換音源 / 🎲隨機更換音源">
+              <span id="lockSourceIcon">🔒</span>
+              <span id="lockSourceText">鎖定目前音源</span>
+            </button>
+            <button id="btnToggleStore" class="btn btn-store-toggle" title="啟用後，點擊任一預設槽位可將當前調製好的聲音參數覆寫儲存至該槽位">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+              <span id="storeToggleText">儲存模式</span>
+            </button>
+            <!-- Auto Cycle Mode Selector (Sequential vs Random Shuffle) -->
+            <button id="btnMorphMode" class="btn btn-morph-mode" title="切換自動巡航模式：順序巡航 (1→2→...→8) 或 隨機漫遊 (Shuffle 隨機跳選)">
+              <span id="morphModeIcon">🔁</span>
+              <span id="morphModeText">順序巡航</span>
+            </button>
+            <button id="btnAutoCycle" class="btn btn-autocycle" title="自動巡航漸變 8 組預設槽位 (適合環境音樂與自動生成音景)">
+              <span class="cycle-icon">↻</span>
+              <span id="autoCycleText">自動巡航</span>
+            </button>
+            <!-- Random Morph Next Trigger -->
+            <button id="btnRandomMorphNext" class="btn btn-random-morph" title="立即隨機漸變至另一個預設槽位">
+              <span>🎲 隨機跳轉</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 8 Preset Slot Buttons Row -->
+      <div class="preset-slots-grid" id="presetSlotsGrid">
+        <!-- Generated dynamically via JS -->
+      </div>
+
+      <!-- Real-time Morph Progress Indicator Bar -->
+      <div class="morph-progress-wrap">
+        <div class="progress-track">
+          <div id="morphProgressBar" class="morph-progress-bar" style="width: 0%;"></div>
+        </div>
+        <div class="progress-status-row">
+          <span id="morphProgressText" class="morph-progress-text">就緒：點擊任一預設槽位進行漸變</span>
+          <span id="morphRemainingText" class="morph-remaining-text">--</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Main Deck Controls: 4 Columns Grid (Parameters on Top) -->
+    <section class="controls-grid">
+
+      <!-- Column 1: Audio Exciters & Signal Sources -->
+      <div class="deck-card">
+        <div class="deck-header">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span class="deck-badge">01</span>
+            <h3>音訊輸入源 (Input Sources)</h3>
+          </div>
+          <button id="btnRandomSource" class="btn btn-compact btn-random-source" title="立即隨機切換一種音訊輸入激勵源 (取樣 / 脈衝 / 雜訊 / 合成)">
+            <span>🎲 隨機換音源</span>
+          </button>
+        </div>
+
+        <!-- Unified Source Tabs -->
+        <div class="source-nav">
+          <button class="source-tab-btn active" data-source="sampler">取樣音檔</button>
+          <button class="source-tab-btn" data-source="impulse">脈衝點擊</button>
+          <button class="source-tab-btn" data-source="noise">雜訊風鳴</button>
+          <button class="source-tab-btn" data-source="synth">合成琶音</button>
+          <button class="source-tab-btn" data-source="mic">麥克風</button>
+        </div>
+
+        <!-- Sub-panel: Sampler (Local File + Built-in) -->
+        <div class="source-panel active" id="source-sampler">
+          <label for="audioFileInput" class="file-dropzone" id="fileDropZone" title="點擊選擇或直接拖放音訊檔案至此">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            <p><strong>點擊選擇或拖放音檔至此</strong></p>
+            <p style="font-size: 0.65rem; color: var(--text-dim); margin-top: 1px;">(支援 WAV, MP3, FLAC, OGG, AAC, M4A)</p>
+            <div id="sampleFileName" class="file-name" style="display: none;"></div>
+          </label>
+          <input type="file" id="audioFileInput" accept="audio/*" style="display: none;">
+
+          <div style="display: flex; gap: 6px;">
+            <button id="btnSamplePlay" class="btn btn-primary" style="flex: 1;" title="播放載入之音檔">
+              <span id="samplePlayIcon">▶</span>
+              <span id="samplePlayText">播放音檔</span>
+            </button>
+            <button id="btnSampleLoop" class="btn btn-loop active" title="切換循環播放或單次播放">
+              <span id="sampleLoopIcon">🔁</span>
+              <span id="sampleLoopText">循環開</span>
+            </button>
+          </div>
+
+          <!-- Sample Pre-Gain Boost Slider -->
+          <div class="param-row" style="margin-top: 6px;">
+            <div class="param-label">
+              <span>音檔激勵增益 (Sample Input Gain)</span>
+              <span id="valSampleGain" class="val-num">100% (0dB)</span>
+            </div>
+            <input type="range" id="sliderSampleGain" min="0.2" max="3.0" step="0.05" value="1.0">
+            <div class="slider-ticks">
+              <span>50%</span>
+              <span>100% (標準)</span>
+              <span>200% (+6dB)</span>
+              <span>300% (+10dB)</span>
+            </div>
+          </div>
+
+          <div class="param-row" style="margin-top: 4px;">
+            <label for="selBuiltinSample">或切換內建示範素材</label>
+            <select id="selBuiltinSample" class="select-styled">
+              <option value="drum_loop">節奏鼓組循環 (Drum Loop)</option>
+              <option value="vocal_speech">人聲母音吟唱 (Vocal Formant)</option>
+              <option value="rain_water">自然雨滴水聲 (Raindrops)</option>
+              <option value="metallic_texture">金屬擦弦質地 (Bowed Metal)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Sub-panel: Impulse -->
+        <div class="source-panel" id="source-impulse">
+          <div class="param-row">
+            <div class="param-label">
+              <span>脈衝頻率 (Density Rate)</span>
+              <span id="valImpulseRate" class="val-num">12.0 Hz</span>
+            </div>
+            <input type="range" id="sliderImpulseRate" min="0.5" max="60" step="0.5" value="12">
+          </div>
+
+          <div class="param-row">
+            <div class="param-label">
+              <span>隨機雨滴分佈 (Stochastic)</span>
+              <span id="valImpulseRandom" class="val-num">40%</span>
+            </div>
+            <input type="range" id="sliderImpulseRandom" min="0" max="1" step="0.01" value="0.4">
+          </div>
+
+          <div class="param-row">
+            <div class="param-label">
+              <span>點擊硬度 (Hardness)</span>
+              <span id="valImpulseHardness" class="val-num">80%</span>
+            </div>
+            <input type="range" id="sliderImpulseHardness" min="0.1" max="1" step="0.01" value="0.8">
+          </div>
+
+          <button id="btnManualTrigger" class="btn btn-secondary full-width" style="padding: 4px 8px; font-size: 0.74rem;">⚡ 手動單次敲擊</button>
+        </div>
+
+        <!-- Sub-panel: Noise -->
+        <div class="source-panel" id="source-noise">
+          <div class="param-row">
+            <label for="selNoiseType">雜訊頻譜類型</label>
+            <select id="selNoiseType" class="select-styled">
+              <option value="pink">粉紅雜訊 (Pink Noise - 柔和自然)</option>
+              <option value="white">白雜訊 (White Noise - 明亮全頻)</option>
+            </select>
+          </div>
+
+          <div class="param-row checkbox-row">
+            <label class="chk-label">
+              <input type="checkbox" id="chkNoisePulsed">
+              <span>節奏脈衝門閥 (Pulsed Burst)</span>
+            </label>
+          </div>
+
+          <div class="param-row">
+            <div class="param-label">
+              <span>脈衝頻率 (Pulse Rate)</span>
+              <span id="valNoiseRate" class="val-num">2.0 Hz</span>
+            </div>
+            <input type="range" id="sliderNoiseRate" min="0.2" max="10" step="0.1" value="2.0">
+          </div>
+        </div>
+
+        <!-- Sub-panel: Synth -->
+        <div class="source-panel" id="source-synth">
+          <div class="param-row">
+            <label for="selSynthWave">合成波形</label>
+            <select id="selSynthWave" class="select-styled">
+              <option value="sawtooth">鋸齒波 (Sawtooth - 豐富泛音)</option>
+              <option value="square">方波 (Square - 空心木管感)</option>
+              <option value="triangle">三角波 (Triangle - 溫潤低音)</option>
+              <option value="sine">正弦波 (Sine - 純淨純音)</option>
+            </select>
+          </div>
+
+          <div class="param-row">
+            <div class="param-label">
+              <span>振盪頻率 (Base Freq)</span>
+              <span id="valSynthFreq" class="val-num">110 Hz</span>
+            </div>
+            <input type="range" id="sliderSynthFreq" min="40" max="600" step="1" value="110">
+          </div>
+
+          <div class="param-row checkbox-row">
+            <label class="chk-label">
+              <input type="checkbox" id="chkSynthArp" checked>
+              <span>琶音自動演奏 (Arpeggiator)</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Sub-panel: Mic -->
+        <div class="source-panel" id="source-mic">
+          <button id="btnMicToggle" class="btn btn-secondary full-width" style="margin-top: 10px;" title="開啟或關閉麥克風即時輸入">
+            <span>🎤 開啟麥克風</span>
+          </button>
+          <div style="font-size: 0.68rem; color: var(--text-dim); margin-top: 8px; line-height: 1.4;">
+            * 即時麥克風訊號將直接注入共振濾波器組。<br>建議配戴耳機以避免聲音反饋。
+          </div>
+        </div>
+      </div>
+
+      <!-- Column 2: Resonator Bank Core Parameters -->
+      <div class="deck-card">
+        <div class="deck-header">
+          <span class="deck-badge">02</span>
+          <h3>共振核心 (Reson Core)</h3>
+        </div>
+
+        <div class="grid-2col">
+          <div class="param-row">
+            <label for="selFilterCount">濾波器組數量</label>
+            <select id="selFilterCount" class="select-styled">
+              <option value="16">16 頻段 (輕盈清晰)</option>
+              <option value="24">24 頻段</option>
+              <option value="32" selected>32 頻段 (標準推薦)</option>
+              <option value="48">48 頻段</option>
+              <option value="64">64 頻段 (稠密細膩)</option>
+              <option value="128">128 頻段 (極致音景)</option>
+            </select>
+          </div>
+
+          <div class="param-row">
+            <label for="selFilterMode">濾波器類型</label>
+            <select id="selFilterMode" class="select-styled">
+              <option value="bandpass" selected>帶通 (Bandpass - 經典共振)</option>
+              <option value="peaking">峰值諧振 (Peaking - 增強原音)</option>
+              <option value="lowpass">共振低通 (Resonant Lowpass)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="param-row">
+          <div class="param-label">
+            <span>基準中心頻率 (Center Freq / F₀)</span>
+            <div class="freq-tag-wrap">
+              <span id="noteCenterFreq" class="note-pill">A4</span>
+              <span id="valCenterFreq" class="val-num">440 Hz</span>
+            </div>
+          </div>
+          <input type="range" id="sliderCenterFreq" min="30" max="4000" step="1" value="440">
+        </div>
+
+        <div class="param-row">
+          <div class="param-label">
+            <span>共振品質因子 (Resonance Q)</span>
+            <span id="valQ" class="val-num">25.0</span>
+          </div>
+          <input type="range" id="sliderQ" min="0.5" max="150" step="0.5" value="25">
+          <div class="slider-ticks">
+            <span>0.5 (柔和)</span>
+            <span>25 (豐滿)</span>
+            <span>75 (金屬)</span>
+            <span>150 (無盡鳴響)</span>
+          </div>
+        </div>
+
+        <div class="param-row">
+          <div class="param-label">
+            <span>頻率展開倍率 (Spread / Bandwidth)</span>
+            <span id="valSpread" class="val-num">1.00x</span>
+          </div>
+          <input type="range" id="sliderSpread" min="0.1" max="4.0" step="0.05" value="1.0">
+        </div>
+
+        <div class="param-row">
+          <div class="param-label">
+            <span>衰減阻尼傾斜 (Decay / Damping Tilt)</span>
+            <span id="valDamping" class="val-num">0.00</span>
+          </div>
+          <input type="range" id="sliderDamping" min="-1.0" max="1.0" step="0.05" value="0.0">
+          <div class="slider-ticks">
+            <span>-1.0 (高音快衰/木質)</span>
+            <span>0 (均勻)</span>
+            <span>+1.0 (高音悠長/玻璃)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Column 3: Distribution & Scales -->
+      <div class="deck-card">
+        <div class="deck-header">
+          <span class="deck-badge">03</span>
+          <h3>調律空間與乾濕混音 (Tuning & Mix)</h3>
+        </div>
+
+        <div class="param-row">
+          <label for="selDistMode">頻率分佈模式 (Distribution)</label>
+          <select id="selDistMode" class="select-styled">
+            <option value="harmonic">諧波列 (Harmonic Series - 自然泛音)</option>
+            <option value="subharmonic">次諧波列 (Subharmonic - 深沉基底)</option>
+            <option value="geometric">等比八度 (Geometric Octave - 對數均勻)</option>
+            <option value="linear">線性梳形 (Linear Comb - 金屬非諧音)</option>
+            <option value="pentatonic">五聲音階 (Pentatonic - 民族旋律感)</option>
+            <option value="gamelan">甘美朗 (Gamelan Slendro & Pelog)</option>
+            <option value="wholetone">全音階 (Whole Tone - 德布西夢境)</option>
+            <option value="just">自然純律 (Just Intonation - 晶瑩純粹)</option>
+            <option value="microtonal">24 平均律微音程 (Quarter-Tone 微分音)</option>
+            <option value="formant">人聲母音共鳴峰 (Formant Vowels A-E-I-O-U)</option>
+            <option value="random">隨機有機金屬板 (Stochastic Metal Plate)</option>
+          </select>
+        </div>
+
+        <div class="param-row">
+          <label for="selGainProfile">頻譜能量輪廓 (Spectral Gain Profile)</label>
+          <select id="selGainProfile" class="select-styled">
+            <option value="flat">平坦均勻 (Flat)</option>
+            <option value="pink">粉紅衰減 (Pink 1/f - 溫潤低音)</option>
+            <option value="bell">中心鐘形聚焦 (Center Bell Peak)</option>
+            <option value="flutter">有機隨機波動 (Flutter)</option>
+          </select>
+        </div>
+
+        <div class="param-row">
+          <div class="param-label">
+            <span>立體聲空間拓展 (Stereo Spread)</span>
+            <span id="valStereo" class="val-num">80%</span>
+          </div>
+          <input type="range" id="sliderStereo" min="0" max="1" step="0.01" value="0.8">
+        </div>
+
+        <div class="param-row">
+          <div class="param-label">
+            <span>微擾動游移率 (Agitation / Detune)</span>
+            <span id="valAgitation" class="val-num">15%</span>
+          </div>
+          <input type="range" id="sliderAgitation" min="0" max="1" step="0.01" value="0.15">
+        </div>
+
+        <div class="param-row dry-wet-deck-row">
+          <div class="param-label">
+            <span>乾/濕音訊混合 (Dry / Wet Mix)</span>
+            <span id="valDryWetDeck" class="val-num">85% (共振濕音)</span>
+          </div>
+          <input type="range" id="sliderDryWetDeck" min="0" max="1" step="0.01" value="0.85">
+          <div class="slider-ticks">
+            <span>0% 原音乾</span>
+            <span>50% 均衡</span>
+            <span>100% 濾波濕</span>
+          </div>
+        </div>
+
+        <button id="btnReseed" class="btn btn-secondary full-width">🎲 重新隨機擾動 (Reseed Randomness)</button>
+      </div>
+
+      <!-- Column 4: Presets & Sound Design -->
+      <div class="deck-card">
+        <div class="deck-header">
+          <span class="deck-badge">04</span>
+          <h3>聲響預設庫 (Presets)</h3>
+        </div>
+
+        <div class="param-row">
+          <label for="selPreset">選擇經典電子聲響預設</label>
+          <select id="selPreset" class="select-styled preset-dropdown">
+            <option value="tibetan_bowl">西藏頌缽 (Tibetan Singing Bowl)</option>
+            <option value="crystal_cathedral">水晶教堂鐘 (Crystal Cathedral Bells)</option>
+            <option value="alien_vowel">外星母音合唱 (Alien Formant Choir)</option>
+            <option value="balinese_gamelan">印尼甘美朗金屬片琴 (Balinese Gamelan)</option>
+            <option value="raindrop_kalimba">雨滴卡林巴琴 (Raindrop Kalimba)</option>
+            <option value="deep_submarine">深海金屬潛艇 (Deep Ocean Submarine)</option>
+            <option value="glass_windpipe">玻璃風管共振 (Glass Windpipe Resonator)</option>
+            <option value="scifi_wholetone">全音階太空迷幻 (Whole-Tone Sci-Fi Drone)</option>
+            <option value="microtonal_shimmer">二十四平均律金屬微塵 (24-TET Shimmer)</option>
+            <option value="vocal_robot">語音機械濾波 (Vocal Robot Resonator)</option>
+          </select>
+        </div>
+
+        <div class="preset-info-card-compact">
+          <p class="compact-tip-text">💡 <strong>提示：</strong>可點選上方 8 組預設槽位進行平滑漸變；或將聲音存入下方 2D 盤之 4 個快照角落進行雙線性插值漫遊！</p>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- Bottom Visualizer Section: Resonant Poles, Spectrum & 2D Vector Pad -->
+    <section class="visualizer-grid">
+      <!-- Real-time Dual Spectrum Visualizer -->
+      <div class="panel-card spectrum-panel">
+        <div class="panel-header">
+          <div class="panel-title">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>
+            <span>頻譜即時響應與共振極點 (Resonant Poles & Spectrum)</span>
+          </div>
+          <div class="canvas-hints">
+            <span>🖱️ 畫布拖曳：橫軸調頻率 (F₀)，縱軸調銳利度 (Q)</span>
+            <span>✜ 滾輪：頻寬開合 (Spread)</span>
+          </div>
+        </div>
+
+        <div class="canvas-wrap">
+          <canvas id="spectrumCanvas" width="920" height="260"></canvas>
+        </div>
+
+        <!-- Filter Energy Waterfall / Bar Array -->
+        <div class="filter-bars-wrap" title="各濾波器頻段能量即時活動 (Filter Activity Bars)">
+          <canvas id="filterBarsCanvas" width="920" height="24"></canvas>
+        </div>
+      </div>
+
+      <!-- 2D Morphing & Orbit Vector Pad -->
+      <div class="panel-card pad-panel">
+        <div class="panel-header">
+          <div class="panel-title">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
+            <span>2D 向量質地漸變盤 (2D Vector Controller)</span>
+          </div>
+          <div class="pad-actions">
+            <button id="btnPadMode" class="btn-micro" title="切換直接控制或4角快照漸變">切換: 直接控制 (X:Freq, Y:Q)</button>
+            <button id="btnPadOrbit" class="btn-micro" title="啟動自動漂移漫遊物理運動">▶ 漫遊運動 (Orbit / Wander)</button>
+          </div>
+        </div>
+
+        <div class="pad-canvas-wrap">
+          <canvas id="padCanvas" width="340" height="260"></canvas>
+        </div>
+
+        <!-- Snapshot Store Row -->
+        <div class="snapshot-controls" title="將目前的共振參數存入 4 個角落快照，以進行平滑雙線性插值漸變">
+          <span class="lbl-snapshot">儲存快照：</span>
+          <button id="btnStoreA" class="btn-snap">A (左上)</button>
+          <button id="btnStoreB" class="btn-snap">B (右上)</button>
+          <button id="btnStoreC" class="btn-snap">C (左下)</button>
+          <button id="btnStoreD" class="btn-snap">D (右下)</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer with Lab Info -->
+  <footer class="app-footer">
+    <div class="footer-inner">
+      <div class="footer-left">
+        <span>© 2026 互動音樂與多媒體實驗室 (ILAB)</span>
+        <span class="footer-sep">•</span>
+        <span>實驗室主持人：鄭建文 (Prof. Cheng-Wen Cheng)</span>
+      </div>
+      <div class="footer-right">
+        <a href="https://ilab-ntut.blogspot.com/" target="_blank" rel="noopener noreferrer">ILAB 實驗室網站</a>
+        <span class="footer-sep">•</span>
+        <a href="https://cwcheng2009.blogspot.com/" target="_blank" rel="noopener noreferrer">主持人個人網站</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Full-Window Drag & Drop Overlay -->
+  <div id="windowDropOverlay" class="window-drop-overlay" style="display: none;">
+    <div class="drop-overlay-box">
+      <svg viewBox="0 0 24 24" width="54" height="54" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      <h2>釋放滑鼠以載入音訊檔案</h2>
+      <p>支援 WAV, MP3, FLAC, OGG, AAC 格式，將自動切換為取樣來源並啟動共振濾波器組！</p>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="reson-engine.js?v=2.5.0"></script>
+  <script src="app.js?v=2.5.0"></script>
+</body>
+</html>
